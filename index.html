@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
     <title>嘤嘤嘤 - /</title>
     <link rel="stylesheet" href="//s2.pstatp.com/cdn/expire-1-M/mdui/0.4.0/css/mdui.min.css">
+    <script src="//www.mdui.org/source/dist/js/mdui.min.js"></script>
     <link href="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.js"></script>
     <style>
@@ -236,13 +237,32 @@
         </div>
 
 
-        <div class="mdui-container-fluid">
+        <div class="mdui-container-fluid" style="position:relative">
             <div>
                 <div align="right">
                     <button type="button" id="closevideo" onclick="dplayerclose()"
                         class="mdui-textfield-close mdui-btn mdui-btn-icon"><i
                             class="mdui-icon material-icons">close</i></button>
                 </div>
+
+                <div id="playerRightButton" onmouseover="showControlerButton()" onmouseout="hideControlerButton()"
+                    onclick="nextVideo()" style="position:absolute;right:8px;z-index:10;width:100px;display: none">
+                </div>
+
+                <div>
+                    <div id="rightArea" class="mdui-shadow-24"
+                        style="position:absolute;right:8px;z-index:5;width:100px;display: none"></div>
+                </div>
+
+                <div id="playerLeftButton" onmouseover="showControlerButton()" onmouseout="hideControlerButton()"
+                    onclick="previousVideo()" style="position:absolute;left:8px;z-index:10;width:100px;display: none">
+                </div>
+
+                <div>
+                    <div id="leftArea" class="mdui-shadow-24"
+                        style="position:absolute;left:8px;z-index:5;width:100px;display: none"></div>
+                </div>
+
                 <div id="dplayer"></div>
             </div>
 
@@ -264,14 +284,13 @@
         </div>
         </button>
         <script>
-            vediourl='';
             let domain = window.location.host,
                 rootPath = "{{.RootPath}}",
                 currentPath = "{{.CurrentPath}}",
                 rawData = "{{.RawData}}",
                 title = 'storage - ',
-                downloadLink = ''
-
+                downloadLink = '',
+                vedioIndex = 0
             if (currentPath === "/") {
                 currentPath = ""
             }
@@ -279,10 +298,16 @@
                 pageData = JSON.parse(window.atob(rawData)),
                 arrayPath = new Array(),
                 arrayFloder = new Array(),
+                arryVideo = new Array(),
                 arrayFile = new Array();
+
+
             for (let item in pageData) {
                 if (item.indexOf("@") == 0) {
                     continue
+                }
+                if (getFileType(decodeURIComponent(pageData[item]['name'])) == "video") {
+                    arryVideo.push(decodeURIComponent(pageData[item]['name']));
                 }
                 if (pageData[item]['@type'] == 'file') {
                     arrayFile.push(pageData[item]);
@@ -291,6 +316,7 @@
                     arrayFloder.push(pageData[item]);
                 }
             }
+            console.log(arryVideo)
 
             function goto(thePath) {
                 window.location.href = thePath;
@@ -434,7 +460,7 @@
                 }
                 if (getFileType(itemName) == "video") {
                     icon = 'play_circle_filled';
-                    clickCode = `onclick="dplayeropen(`+`\'${url}\'`+`)"`
+                    clickCode = `onclick="dplayeropen(` + `\'${url}\'` + `)"`
                 }
 
                 let code = `<i class="mdui-icon material-icons" ${clickCode}>${icon}</i>`
@@ -456,15 +482,24 @@
             }
 
             function show(obj) {
-                return obj.setAttribute('style', 'display:block')
+                return obj.setAttribute('style', 'display:block');
             }
 
             function hide(obj) {
-                return obj.setAttribute('style', 'display:none')
+                return obj.setAttribute('style', 'display:none');
+            }
+
+            function setDisplayNone(obj) {
+                document.getElementById(obj).style.display = "none";
+            }
+
+            function setDisplayBlock(obj) {
+                document.getElementById(obj).style.display = "block";
             }
             let btn = document.getElementById('btn'),
                 close = document.getElementById('close'),
                 stext = document.getElementById('text-input');
+
             btn.addEventListener('click', function () {
                 show(stext);
                 show(close);
@@ -475,27 +510,77 @@
                 hide(close);
                 show(btn);
             }, false);
-            window.onload = view("name");
-
 
 
             function dplayerclose() {
-                var element = document.getElementById('closevideo');
-                element.style.display = "none";
-                dp.destroy()
+                setDisplayNone('closevideo');
+                setDisplayNone('playerRightButton');
+                setDisplayNone('rightArea');
+                setDisplayNone('playerLeftButton');
+                setDisplayNone('leftArea');
+                dp.destroy();
             }
 
             function dplayeropen(linkurl) {
-                var element = document.getElementById('closevideo');
-                element.style.display = "block";
+                document.getElementById('closevideo').style.display = "block";
+                if (arryVideo.length > 1) {
+                    setDisplayBlock("playerRightButton");
+                    setDisplayBlock("rightArea");
+                    setDisplayBlock("playerLeftButton");
+                    setDisplayBlock("leftArea");
+                }
                 dp = new DPlayer({
                     container: document.getElementById('dplayer'),
-                    autoplay:true,
+                    autoplay: true,
                     video: {
                         url: linkurl,
                     },
                 });
+                fixedControlerButton();
             }
+
+            function fixedControlerButton() {
+                let div = document.getElementById('dplayer');
+                document.getElementById('playerRightButton').style.height = div.offsetHeight - 45 + "px";
+                document.getElementById('rightArea').style.height = div.offsetHeight + "px";
+                document.getElementById('playerLeftButton').style.height = div.offsetHeight - 45 + "px";
+                document.getElementById('leftArea').style.height = div.offsetHeight + "px";
+
+            }
+
+            function showControlerButton() {
+                fixedControlerButton();
+                setDisplayBlock('rightArea');
+                setDisplayBlock('leftArea');
+            }
+
+            function hideControlerButton() {
+                fixedControlerButton();
+                setDisplayNone('rightArea');
+                setDisplayNone('leftArea');
+            }
+
+            function nextVideo() {
+                if (dp == null) return;
+                if (vedioIndex < arryVideo.length-1) {
+                    vedioIndex = vedioIndex + 1;
+                    link = "http://" + domain + currentPath + '/' + arryVideo[vedioIndex];
+                    dplayeropen(link);
+                }
+            }
+
+            function previousVideo() {
+                if (dp == null) return;
+                if (vedioIndex > 0) {
+                    vedioIndex = vedioIndex - 1;
+                    link = "http://" + domain + currentPath + '/' + arryVideo[vedioIndex];
+                    dplayeropen(link);
+                }
+            }
+
+
+
+            window.onload = view("name");
         </script>
 </body>
 
