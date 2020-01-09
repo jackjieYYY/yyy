@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex,nofollow">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
-    <title>嘤嘤嘤 - /</title>
+    <title>storage - /</title>
     <link rel="stylesheet" href="//s2.pstatp.com/cdn/expire-1-M/mdui/0.4.0/css/mdui.min.css">
     <script src="//www.mdui.org/source/dist/js/mdui.min.js"></script>
     <link href="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.css" rel="stylesheet">
@@ -529,6 +529,7 @@
                     setDisplayBlock("playerLeftButton");
                     setDisplayBlock("leftArea");
                 }
+                backtoTop();
                 dp = new DPlayer({
                     container: document.getElementById('dplayer'),
                     autoplay: true,
@@ -562,7 +563,7 @@
 
             function nextVideo() {
                 if (dp == null) return;
-                if (vedioIndex < arryVideo.length-1) {
+                if (vedioIndex < arryVideo.length - 1) {
                     vedioIndex = vedioIndex + 1;
                     link = "http://" + domain + currentPath + '/' + arryVideo[vedioIndex];
                     dplayeropen(link);
@@ -575,6 +576,14 @@
                     vedioIndex = vedioIndex - 1;
                     link = "http://" + domain + currentPath + '/' + arryVideo[vedioIndex];
                     dplayeropen(link);
+                }
+            }
+
+            function backtoTop() {
+                var currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+                if (currentScroll > 0) {
+                    window.requestAnimationFrame(backtoTop);
+                    window.scrollTo(0, currentScroll - (currentScroll / 6));
                 }
             }
 
