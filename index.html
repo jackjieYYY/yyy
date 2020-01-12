@@ -9,9 +9,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
     <title>storage - /</title>
     <link rel="stylesheet" href="//s2.pstatp.com/cdn/expire-1-M/mdui/0.4.0/css/mdui.min.css">
-    <script src="//www.mdui.org/source/dist/js/mdui.min.js"></script>
-    <link href="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css">
     <script src="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.js"></script>
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js"></script>
+    <script src="//www.mdui.org/source/dist/js/mdui.min.js"></script>
+
+
     <style>
         body {
             background-color: #f2f5fa
@@ -262,7 +266,7 @@
                     <div id="leftArea" class="mdui-shadow-24"
                         style="position:absolute;left:8px;z-index:5;width:100px;display: none"></div>
                 </div>
-
+                <div id="aplayer"></div>
                 <div id="dplayer"></div>
             </div>
 
@@ -460,7 +464,11 @@
                 }
                 if (getFileType(itemName) == "video") {
                     icon = 'play_circle_filled';
-                    clickCode = `onclick="dplayeropen(` + `\'${url}\'` + `)"`
+                    clickCode = `onclick="dplayeropen('${url}')"`;
+                }
+                if (getFileType(itemName) == "audio") {
+                    icon = 'audiotrack';
+                    clickCode = `onclick="audioAdd('${url}','${item['name']}')"`;
                 }
 
                 let code = `<i class="mdui-icon material-icons" ${clickCode}>${icon}</i>`
@@ -472,10 +480,13 @@
                 if (!name) return false;
                 var imgType = ["gif", "jpeg", "jpg", "bmp", "png"];
                 var videoType = ["avi", "wmv", "mkv", "mp4", "mov", "rm", "3gp", "flv", "mpg", "rmvb"];
+                var audioType = ["mp3", "m4a", "wma", "wav", "ape", "flac", "acc", "ogg"];
                 if (RegExp("\.(" + imgType.join("|") + ")$", "i").test(name.toLowerCase())) {
                     return 'image';
                 } else if (RegExp("\.(" + videoType.join("|") + ")$", "i").test(name.toLowerCase())) {
                     return 'video';
+                } else if (RegExp("\.(" + audioType.join("|") + ")$", "i").test(name.toLowerCase())) {
+                    return 'audio';
                 } else {
                     return false;
                 }
@@ -538,7 +549,24 @@
                     },
                 });
                 fixedControlerButton();
+                document.getElementsByClassName("dplayer-controller")[0].style.zIndex=15;
             }
+
+            function initAplayer() {
+                ap = new APlayer({
+                    container: document.getElementById('aplayer'),
+                    fixed: true,
+                    autoplay: true,
+                });
+            }
+
+            function audioAdd(url, filename) {
+                ap.list.add([{
+                    name: filename,
+                    url: url,
+                }]);
+            }
+
 
             function fixedControlerButton() {
                 let div = document.getElementById('dplayer');
@@ -565,16 +593,17 @@
                 if (dp == null) return;
                 if (vedioIndex < arryVideo.length - 1) {
                     vedioIndex = vedioIndex + 1;
-                    link = "http://" + domain + currentPath + '/' + arryVideo[vedioIndex];
+                    link = domain + currentPath + '/' + arryVideo[vedioIndex];
                     dplayeropen(link);
                 }
             }
 
             function previousVideo() {
                 if (dp == null) return;
+                if (domain == null) return;
                 if (vedioIndex > 0) {
                     vedioIndex = vedioIndex - 1;
-                    link = "http://" + domain + currentPath + '/' + arryVideo[vedioIndex];
+                    link = domain + currentPath + '/' + arryVideo[vedioIndex];
                     dplayeropen(link);
                 }
             }
@@ -588,8 +617,10 @@
             }
 
 
-
-            window.onload = view("name");
+            window.onload = function () {
+                view("name");
+                initAplayer();
+            }
         </script>
 </body>
 
