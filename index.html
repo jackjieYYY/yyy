@@ -549,7 +549,7 @@
                     },
                 });
                 fixedControlerButton();
-                document.getElementsByClassName("dplayer-controller")[0].style.zIndex=15;
+                document.getElementsByClassName("dplayer-controller")[0].style.zIndex = 15;
             }
 
             function initAplayer() {
@@ -593,7 +593,8 @@
                 if (dp == null) return;
                 if (vedioIndex < arryVideo.length - 1) {
                     vedioIndex = vedioIndex + 1;
-                    link = domain + currentPath + '/' + arryVideo[vedioIndex];
+                    link = 'http://' + domain + currentPath + '/' + arryVideo[vedioIndex];
+                    console.log(link);
                     dplayeropen(link);
                 }
             }
@@ -603,7 +604,8 @@
                 if (domain == null) return;
                 if (vedioIndex > 0) {
                     vedioIndex = vedioIndex - 1;
-                    link = domain + currentPath + '/' + arryVideo[vedioIndex];
+                    link = 'http://' + domain + currentPath + '/' + arryVideo[vedioIndex];
+                    console.log(link);
                     dplayeropen(link);
                 }
             }
