@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  h_at_h：
+    image: disappear9/hentaiathome
+    ports:
+      - "7777:7777"
+    environment:
+      - HatH_KEY=XXX-XXXXXXXXXXXX
+    volumes:
+      - ./h_at_h_data:/hath/data
+      - ./DOWNLOAD_DIR:/hath/download
