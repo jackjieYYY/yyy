@@ -21,8 +21,4 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install dependencies
       run: |
-        git checkout origin/amazonlinux2
-        sudo yum install git kmod make "kernel-devel-uname-r == `uname -r`"
-        sudo make # build kernel modules
-        sudo make install # build and install *unsigned* kernel modules
-        lsmod | grep -e ashmem_linux -e binder_linux
+        sudo apt install dkms
