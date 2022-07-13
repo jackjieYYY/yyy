@@ -21,15 +21,9 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install dependencies
       run: |
-        sudo apt install dkms
-        sudo apt install linux-headers-generic -y
+        sudo apt-get install -y git kmod make gcc linux-headers-`uname -r`
         git clone https://github.com/remote-android/redroid-modules
         cd redroid-modules
-        sudo cp redroid.conf /etc/modules-load.d/ # auto load kernel modules after system boot
-        sudo cp 99-redroid.rules /lib/udev/rules.d/ # change device node permissions
-        sudo cp -rT ashmem /usr/src/redroid-ashmem-1
-        sudo cp -rT binder /usr/src/redroid-binder-1
-        dkms install redroid-ashmem/1
-        dkms install redroid-binder/1
-        lsmod | grep -e ashmem_linux -e binder_linux
+        sudo make # build kernel modules
+        sudo make install # build and install *unsigned* kernel modules
         
