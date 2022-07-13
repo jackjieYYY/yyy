@@ -23,3 +23,13 @@ jobs:
       run: |
         sudo apt install dkms
         sudo apt install linux-headers-generic -y
+        git clone https://github.com/remote-android/redroid-modules
+        cd redroid-modules
+        cp redroid.conf /etc/modules-load.d/ # auto load kernel modules after system boot
+        cp 99-redroid.rules /lib/udev/rules.d/ # change device node permissions
+        cp -rT ashmem /usr/src/redroid-ashmem-1
+        cp -rT binder /usr/src/redroid-binder-1
+        dkms install redroid-ashmem/1
+        dkms install redroid-binder/1
+        lsmod | grep -e ashmem_linux -e binder_linux
+        
